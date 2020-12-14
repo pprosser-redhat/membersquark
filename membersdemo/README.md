@@ -1,6 +1,6 @@
 # membersdemo project
 
-Version 1 of the membersapp
+Version 2 of the membersapp
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
