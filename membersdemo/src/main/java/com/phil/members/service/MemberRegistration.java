@@ -34,7 +34,8 @@ public class MemberRegistration {
 
         Member newMember = new Member();
         newMember.setEmail(member.getEmail());
-        newMember.setName(member.getName());
+        newMember.setFirstName(member.getFirstName());
+        newMember.setLastName(member.getLastName());
         newMember.setPhoneNumber(member.getPhoneNumber());
         Member.persist(newMember);
         

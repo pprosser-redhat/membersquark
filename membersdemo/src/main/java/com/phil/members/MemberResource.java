@@ -50,8 +50,9 @@ public class MemberResource {
 
    @GET
    @Produces(MediaType.APPLICATION_JSON)
-   public List<Member> listAllMembers() {
-       return memberRegistration.findAllOrderedByName();
+   public Response listAllMembers() {
+       //return memberRegistration.findAllOrderedByName();
+       return Response.ok(memberRegistration.findAllOrderedByName()).build();
    }
 
    @GET
@@ -62,6 +63,7 @@ public class MemberResource {
        if (member == null) {
            throw new WebApplicationException(Response.Status.NOT_FOUND);
        }
+       
        return member;
    }
 
