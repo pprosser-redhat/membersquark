@@ -11,3 +11,10 @@ data:
 
 
 # run the app locally to generate DB for now
+
+# do port forward using Oc to the postgres db
+# oc port-forward postgresql-1-z27xf 5432:5432
+
+#deploy
+# mvn clean package -Dquarkus.container-image.build=true -Dquarkus.kubernetes.deploy=true
+# mvn clean package -Dnative -Dquarkus.kubernetes.deploy=true -Dquarkus.native.container-build=true -Dquarkus.native.builder-image=registry.access.redhat.com/quarkus/mandrel-20-rhel8:20.1 -DskipTests
