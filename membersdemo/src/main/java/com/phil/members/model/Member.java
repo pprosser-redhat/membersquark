@@ -40,7 +40,7 @@ public class Member extends PanacheEntityBase {
     private String email;
 
     @NotNull
-    @Size(min = 10, max = 12)
+    @Size(min = 8, max = 12)
     @Digits(fraction = 0, integer = 12)
     @Column(name = "phone_number")
     private String phoneNumber;
