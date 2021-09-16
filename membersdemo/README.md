@@ -1,6 +1,6 @@
 # membersdemo project
 
-Version 2 of the membersapp
+Version 1 of the membersapp
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
@@ -35,6 +35,8 @@ You can create a native executable using:
 ```shell script
 ./mvnw package -Pnative
 ```
+
+./mvnw clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.kubernetes.deploy=true -DskipTests
 
 Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
 ```shell script
