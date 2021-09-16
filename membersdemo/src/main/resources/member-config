@@ -6,6 +6,8 @@ metadata:
 data:
   quarkus.datasource.jdbc.url: 'jdbc:postgresql://postgresql:5432/sampledb'
   quarkus.hibernate-orm.database.generation: none
+  quarkus.datasource.username: phil
+  quarkus.datasource.password: phil
 
 
 
@@ -17,4 +19,4 @@ data:
 
 #deploy
 # mvn clean package -Dquarkus.container-image.build=true -Dquarkus.kubernetes.deploy=true
-# mvn clean package -Dnative -Dquarkus.kubernetes.deploy=true -Dquarkus.native.container-build=true -Dquarkus.native.builder-image=registry.access.redhat.com/quarkus/mandrel-20-rhel8:20.1 -DskipTests
+# mvn clean package -Pnative -Dquarkus.kubernetes.deploy=true -Dquarkus.native.container-build=true -Dquarkus.native.builder-image=registry.access.redhat.com/quarkus/mandrel-20-rhel8:20.1 -DskipTests
