@@ -23,34 +23,77 @@ apiVersion: networking.istio.io/v1alpha3
 metadata:
   name: members
   namespace: membersapp
-  uid: d29a0f02-2e22-46a3-96cc-f1ced7dbc4ac
-  resourceVersion: '1704598'
-  generation: 2
-  creationTimestamp: '2022-03-31T10:31:35Z'
-  managedFields:
-    - manager: Mozilla
-      operation: Update
-      apiVersion: networking.istio.io/v1beta1
-      time: '2022-03-31T10:31:35Z'
-      fieldsType: FieldsV1
-      fieldsV1:
-        'f:spec':
-          .: {}
-          'f:hosts': {}
-          'f:http': {}
 spec:
   hosts:
-    - membersdemov1.membersapp.svc.cluster.local
+    - members.apps.coffee.demolab.local
+  gateways:
+    - members
   http:
     - match:
         - uri:
-            prefix: membersweb
-      name: members-v1-routes
+            prefix: /membersweb/rest/members
       route:
         - destination:
-            host: membersdemov1.membersapp.svc.cluster.local
-````
+            host: membersdemov1
+            port:
+              number: 8080
 
+````
+## Gateway
+
+````
+kind: Gateway
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: members
+  namespace: membersapp
+spec:
+  servers:
+    - hosts:
+        - members.apps.coffee.demolab.local
+      port:
+        name: http
+        number: 80
+        protocol: HTTP
+  selector:
+    istio: ingressgateway
+
+````
+## RHSSO
+````
+kind: RequestAuthentication
+apiVersion: security.istio.io/v1beta1
+metadata:
+  name: rhsso
+  namespace: membersapp
+spec:
+  selector:
+    matchLabels:
+      app: members
+  jwtRules:
+    - issuer: 'http://sso-sso-clear.apps.coffee.demolab.local/auth/realms/3scale'
+      jwksUri: >-
+        http://sso-sso-clear.apps.coffee.demolab.local/auth/realms/3scale/protocol/openid-connect/certs
+
+````
+## Config Map
+````
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: member-config
+  namespace: membersapp
+data:
+  quarkus.datasource.jdbc.url: 'jdbc:postgresql://postgresql:5432/sampledb'
+  quarkus.datasource.password: phil
+  quarkus.datasource.username: phil
+  quarkus.hibernate-orm.database.generation: drop-and-create
+
+````
 ## deployment type
 
 quarkus.openshift.deployment-kind=Deployment
+
+## image group (defaults to user name, need it to be my namespace)
+
+quarkus.container-image.group=membersapp
