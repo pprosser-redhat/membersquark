@@ -97,3 +97,24 @@ quarkus.openshift.deployment-kind=Deployment
 ## image group (defaults to user name, need it to be my namespace)
 
 quarkus.container-image.group=membersapp
+
+## need to get version 1 and 2 to work as subsets in the Istio Destination rule. Trying to influence this with this quarkus properties
+
+Doesn't seem to be a way in Quarkus properties to choose how to generate the K8s service. Will create a new service specific for my istio requirements
+
+````
+kind: Service
+apiVersion: v1
+metadata:
+  name: members
+  namespace: membersapp
+  labels:
+    app: members
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  selector:
+    app: members
+````
