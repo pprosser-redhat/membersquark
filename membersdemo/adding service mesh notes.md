@@ -108,13 +108,13 @@ apiVersion: v1
 metadata:
   name: members
   namespace: membersapp
-  labels:
-    app: members
 spec:
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80
       targetPort: 8080
   selector:
     app: members
+
 ````
