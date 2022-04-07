@@ -1,3 +1,4 @@
+# Service Mesh on it's own
 ## PostgreSQL
 
 added
@@ -15,67 +16,6 @@ quarkus.openshift.annotations."sidecar.istio.io/inject"=true
 
 quarkus.openshift.labels.app=members
 quarkus.openshift.labels.version=v1
-
-## added initial virtual service
-````
-kind: VirtualService
-apiVersion: networking.istio.io/v1alpha3
-metadata:
-  name: members
-  namespace: membersapp
-spec:
-  hosts:
-    - members.apps.coffee.demolab.local
-  gateways:
-    - members
-  http:
-    - match:
-        - uri:
-            prefix: /membersweb/rest/members
-      route:
-        - destination:
-            host: membersdemov1
-            port:
-              number: 8080
-
-````
-## Gateway
-
-````
-kind: Gateway
-apiVersion: networking.istio.io/v1alpha3
-metadata:
-  name: members
-  namespace: membersapp
-spec:
-  servers:
-    - hosts:
-        - members.apps.coffee.demolab.local
-      port:
-        name: http
-        number: 80
-        protocol: HTTP
-  selector:
-    istio: ingressgateway
-
-````
-## RHSSO
-````
-kind: RequestAuthentication
-apiVersion: security.istio.io/v1beta1
-metadata:
-  name: rhsso
-  namespace: membersapp
-spec:
-  selector:
-    matchLabels:
-      app: members
-  jwtRules:
-    - issuer: 'http://sso-sso-clear.apps.coffee.demolab.local/auth/realms/3scale'
-      jwksUri: >-
-        http://sso-sso-clear.apps.coffee.demolab.local/auth/realms/3scale/protocol/openid-connect/certs
-
-````
 ## Config Map
 ````
 kind: ConfigMap
@@ -98,7 +38,7 @@ quarkus.openshift.deployment-kind=Deployment
 
 quarkus.container-image.group=membersapp
 
-## need to get version 1 and 2 to work as subsets in the Istio Destination rule. Trying to influence this with this quarkus properties
+## Create a service that uses a selector to choose between both versions of the members Quarkus service
 
 Doesn't seem to be a way in Quarkus properties to choose how to generate the K8s service. Will create a new service specific for my istio requirements
 
@@ -117,3 +57,290 @@ spec:
   selector:
     app: members
 ````
+
+## Create destination route
+
+````
+kind: DestinationRule
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: members
+  namespace: membersapp
+spec:
+  host: members.membersapp.svc.cluster.local
+  subsets:
+    - labels:
+        app: members
+        version: v1
+      name: v1
+    - labels:
+        app: members
+        version: v2
+      name: v2
+````
+
+## Gateway
+
+````
+kind: Gateway
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: members-gateway
+  namespace: membersapp
+spec:
+  servers:
+    - hosts:
+        - members.apps.coffee.demolab.local
+      port:
+        name: http
+        number: 80
+        protocol: HTTP
+  selector:
+    istio: ingressgateway
+
+
+````
+## added initial virtual service
+````
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: members
+  namespace: membersapp
+spec:
+  hosts:
+    - members.apps.coffee.demolab.local
+  gateways:
+    - membersapp/members-gateway
+  http:
+    - match:
+        - uri:
+            exact: /v1/membersweb/rest/members
+        - uri:
+            prefix: /v1/membersweb/rest/members
+      rewrite:
+        uri: /membersweb/rest/members
+      route:
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v1
+          weight: 100
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v2
+    - match:
+        - uri:
+            exact: /v2/membersweb/rest/members
+        - uri:
+            prefix: /v2/membersweb/rest/members
+      rewrite:
+        uri: /membersweb/rest/members
+      route:
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v1
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v2
+          weight: 100
+    - match:
+        - uri:
+            exact: /q/metrics
+      route:
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v1
+          weight: 50
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v2
+          weight: 50
+````
+
+## RHSSO - Request Authentication
+````
+kind: RequestAuthentication
+apiVersion: security.istio.io/v1beta1
+metadata:
+  name: rhssocheck
+  namespace: membersapp
+spec:
+  selector:
+    matchLabels:
+      app: members
+  jwtRules:
+    - issuer: 'http://sso-sso-clear.apps.coffee.demolab.local/auth/realms/3scale'
+      jwksUri: >-
+        http://sso-sso-clear.apps.coffee.demolab.local/auth/realms/3scale/protocol/openid-connect/certs
+
+
+````
+## Authorisation Policy
+````
+kind: AuthorizationPolicy
+apiVersion: security.istio.io/v1beta1
+metadata:
+  name: membersauth
+  namespace: membersapp
+spec:
+  selector:
+    matchLabels:
+      app: members
+  rules:
+    - to:
+        - operation:
+            methods:
+              - GET
+              - POST
+              - DELETE
+            paths:
+              - /membersweb/*
+      when:
+        - key: 'request.auth.claims[iss]'
+          values:
+            - 'http://sso-sso-clear.apps.coffee.demolab.local/auth/realms/3scale'
+        - key: 'request.auth.claims[azp]'
+          values:
+            - ef2f51f7
+  action: ALLOW
+````
+## Authorisation Policy for metrics "/q" - stopped working when locked down the service
+````
+kind: AuthorizationPolicy
+apiVersion: security.istio.io/v1beta1
+metadata:
+  name: membersmetrics
+  namespace: membersapp
+spec:
+  selector:
+    matchLabels:
+      app: members
+  rules:
+    - to:
+        - operation:
+            methods:
+              - GET
+            paths:
+              - /q/*
+  action: ALLOW
+
+
+``````
+# Integration with 3scale
+
+### need to create service entries for 3scale backend and system endpoints
+
+Backend:
+````
+kind: ServiceEntry
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: threescale-backend
+  namespace: membersapp
+spec:
+  hosts:
+    - backend-listener.amp.svc.cluster.local
+  ports:
+    - name: http
+      number: 3000
+      protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
+````
+System:
+````
+kind: ServiceEntry
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: threescale-system
+  namespace: membersapp
+spec:
+  hosts:
+    - system-provider.amp.svc.cluster.local
+  ports:
+    - name: http
+      number: 3000
+      protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
+
+````
+
+## Service Mesh Extension
+
+Get the backend authentication value for a given service, used below in the backend defintion (token)  :
+
+### get the API backend token from 3scale
+curl -v  -X GET "https://red-hat-admin.apps.coffee.demolab.local/admin/api/services/6/proxy/configs/production/latest.json?access_token=97208a746907b2317ec37d324be116585bc19486a020efb7c07c8efbe18b1142" -k |jq '.proxy_config.content.backend_authentication_value'
+
+### Update tokens
+Make sure the tokens are changed accordingly
+
+backend token from above goes in spec.config.services.authorites.token
+user generated token goes in spec.config.system.token
+
+````
+apiVersion: maistra.io/v1
+kind: ServiceMeshExtension
+metadata:
+  name: threescale-auth
+  namespace: membersapp
+spec:
+  config:
+    api: v1
+    backend:
+      extensions:
+        - no_body
+      name: backend
+      upstream:
+        name: outbound|3000||backend-listener.amp.svc.cluster.local
+        timeout: 5000
+        url: 'http://backend-listener.amp.svc.cluster.local'
+    services:
+      - authorities:
+          - '*'
+        credentials:
+          app_id:
+            - header:
+                keys:
+                  - app_id
+            - query_string:
+                keys:
+                  - app_id
+          app_key:
+            - header:
+                keys:
+                  - app_key
+            - query_string:
+                keys:
+                  - app_key
+          user_key:
+            - query_string:
+                keys:
+                  - user_key
+            - header:
+                keys:
+                  - user_key
+        id: '6'
+        mapping_rules:
+          - method: GET
+            pattern: /
+            usages:
+              - delta: 1
+                name: hits
+        token: c9491458baa7a350d4ba65fe2d313841766903670ee0aa8786ab79c345f90a9a
+    system:
+      name: system
+      token: c9491458baa7a350d4ba65fe2d313841766903670ee0aa8786ab79c345f90a9a
+      upstream:
+        name: outbound|3000||system-provider.amp.svc.cluster.local
+        timeout: 5000
+        url: 'http://system-provider.amp.svc.cluster.local'
+  image: 'registry.redhat.io/openshift-service-mesh/3scale-auth-wasm-rhel8:0.0.1'
+  phase: PostAuthZ
+  priority: 100
+  workloadSelector:
+    labels:
+      app: members
+````
+
