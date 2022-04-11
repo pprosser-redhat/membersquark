@@ -228,6 +228,25 @@ spec:
 ``````
 # Integration with 3scale
 
+## Create a gateway for Istio members to avoid it clashing with my normal 3scale demo
+
+````
+kind: Gateway
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: members3scale-gateway
+  namespace: membersapp
+spec:
+  servers:
+    - hosts:
+        - members3scale.apps.coffee.demolab.local
+      port:
+        name: http
+        number: 80
+        protocol: HTTP
+  selector:
+    istio: ingressgateway
+````
 ### need to create service entries for 3scale backend and system endpoints
 
 Backend:
