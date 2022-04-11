@@ -38,6 +38,13 @@ quarkus.openshift.deployment-kind=Deployment
 
 quarkus.container-image.group=membersapp
 
+## BIG note - make sure namespace is changed to the service mesh version of the application
+
+If you see the following error
+````
+Failed to pull image "image-registry.openshift-image-registry.svc:5000/membersapp/membersdemov1:1.0": rpc error: code = Unknown desc = reading manifest 1.0 in image-registry.openshift-image-registry.svc:5000/membersapp/membersdemov1: unauthorized: authentication required
+````
+then you are trying to pull from the wrong namespace
 ## Create a service that uses a selector to choose between both versions of the members Quarkus service
 
 Doesn't seem to be a way in Quarkus properties to choose how to generate the K8s service. Will create a new service specific for my istio requirements
@@ -47,7 +54,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: members
-  namespace: membersapp
+  namespace: membersapp-mesh
 spec:
   ports:
     - name: http
@@ -65,9 +72,9 @@ kind: DestinationRule
 apiVersion: networking.istio.io/v1alpha3
 metadata:
   name: members
-  namespace: membersapp
+  namespace: membersapp-mesh
 spec:
-  host: members.membersapp.svc.cluster.local
+  host: members.membersapp-mesh.svc.cluster.local
   subsets:
     - labels:
         app: members
@@ -86,7 +93,7 @@ kind: Gateway
 apiVersion: networking.istio.io/v1alpha3
 metadata:
   name: members-gateway
-  namespace: membersapp
+  namespace: membersapp-mesh
 spec:
   servers:
     - hosts:
@@ -106,12 +113,12 @@ kind: VirtualService
 apiVersion: networking.istio.io/v1alpha3
 metadata:
   name: members
-  namespace: membersapp
+  namespace: membersapp-mesh
 spec:
   hosts:
     - members.apps.coffee.demolab.local
   gateways:
-    - membersapp/members-gateway
+    - membersapp-mesh/members-gateway
   http:
     - match:
         - uri:
@@ -122,11 +129,11 @@ spec:
         uri: /membersweb/rest/members
       route:
         - destination:
-            host: members.membersapp.svc.cluster.local
+            host: members.membersapp-mesh.svc.cluster.local
             subset: v1
           weight: 100
         - destination:
-            host: members.membersapp.svc.cluster.local
+            host: members.membersapp-mesh.svc.cluster.local
             subset: v2
     - match:
         - uri:
@@ -137,10 +144,10 @@ spec:
         uri: /membersweb/rest/members
       route:
         - destination:
-            host: members.membersapp.svc.cluster.local
+            host: members.membersapp-mesh.svc.cluster.local
             subset: v1
         - destination:
-            host: members.membersapp.svc.cluster.local
+            host: members.membersapp-mesh.svc.cluster.local
             subset: v2
           weight: 100
     - match:
@@ -148,11 +155,11 @@ spec:
             exact: /q/metrics
       route:
         - destination:
-            host: members.membersapp.svc.cluster.local
+            host: members.membersapp-mesh.svc.cluster.local
             subset: v1
           weight: 50
         - destination:
-            host: members.membersapp.svc.cluster.local
+            host: members.membersapp-mesh.svc.cluster.local
             subset: v2
           weight: 50
 ````
