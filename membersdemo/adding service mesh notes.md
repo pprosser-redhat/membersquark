@@ -228,6 +228,44 @@ spec:
 ``````
 # Integration with 3scale
 
+## create a new service to isolate from normal demo
+
+````
+kind: Service
+apiVersion: v1
+metadata:
+  name: threescalemembers
+  namespace: membersapp
+  labels:
+    app: members
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+  selector:
+    3scaleapp: members
+````
+## Create a gateway for Istio members to avoid it clashing with my normal 3scale demo
+
+````
+kind: Gateway
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: members3scale-gateway
+  namespace: membersapp
+spec:
+  servers:
+    - hosts:
+        - members3scale.apps.coffee.demolab.local
+      port:
+        name: http
+        number: 80
+        protocol: HTTP
+  selector:
+    istio: ingressgateway
+````
 ### need to create service entries for 3scale backend and system endpoints
 
 Backend:
@@ -264,6 +302,63 @@ spec:
   location: MESH_EXTERNAL
   resolution: DNS
 
+````
+
+## added initial virtual service
+````
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: members
+  namespace: membersapp
+spec:
+  hosts:
+    - members3scale.apps.coffee.demolab.local
+  gateways:
+    - membersapp/members-gateway
+  http:
+    - match:
+        - uri:
+            exact: /v1/membersweb/rest/members
+        - uri:
+            prefix: /v1/membersweb/rest/members
+      rewrite:
+        uri: /membersweb/rest/members
+      route:
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v1
+          weight: 100
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v2
+    - match:
+        - uri:
+            exact: /v2/membersweb/rest/members
+        - uri:
+            prefix: /v2/membersweb/rest/members
+      rewrite:
+        uri: /membersweb/rest/members
+      route:
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v1
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v2
+          weight: 100
+    - match:
+        - uri:
+            exact: /q/metrics
+      route:
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v1
+          weight: 50
+        - destination:
+            host: members.membersapp.svc.cluster.local
+            subset: v2
+          weight: 50
 ````
 
 ## Service Mesh Extension
