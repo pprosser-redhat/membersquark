@@ -163,7 +163,7 @@ kind: RequestAuthentication
 apiVersion: security.istio.io/v1beta1
 metadata:
   name: rhssocheck
-  namespace: membersapp
+  namespace: membersapp-mesh
 spec:
   selector:
     matchLabels:
@@ -181,7 +181,7 @@ kind: AuthorizationPolicy
 apiVersion: security.istio.io/v1beta1
 metadata:
   name: membersauth
-  namespace: membersapp
+  namespace: membersapp-mesh
 spec:
   selector:
     matchLabels:
@@ -210,7 +210,7 @@ kind: AuthorizationPolicy
 apiVersion: security.istio.io/v1beta1
 metadata:
   name: membersmetrics
-  namespace: membersapp
+  namespace: membersapp-mesh
 spec:
   selector:
     matchLabels:
@@ -254,7 +254,7 @@ kind: Gateway
 apiVersion: networking.istio.io/v1alpha3
 metadata:
   name: members3scale-gateway
-  namespace: membersapp
+  namespace: membersapp-mesh
 spec:
   servers:
     - hosts:
@@ -274,7 +274,7 @@ kind: ServiceEntry
 apiVersion: networking.istio.io/v1alpha3
 metadata:
   name: threescale-backend
-  namespace: membersapp
+  namespace: membersapp-mesh
 spec:
   hosts:
     - backend-listener.amp.svc.cluster.local
@@ -291,7 +291,7 @@ kind: ServiceEntry
 apiVersion: networking.istio.io/v1alpha3
 metadata:
   name: threescale-system
-  namespace: membersapp
+  namespace: membersapp-mesh
 spec:
   hosts:
     - system-provider.amp.svc.cluster.local
@@ -310,12 +310,12 @@ kind: VirtualService
 apiVersion: networking.istio.io/v1alpha3
 metadata:
   name: members
-  namespace: membersapp
+  namespace: membersapp-mesh
 spec:
   hosts:
     - members3scale.apps.coffee.demolab.local
   gateways:
-    - membersapp/members-gateway
+    - membersapp-mesh/members-gateway
   http:
     - match:
         - uri:
