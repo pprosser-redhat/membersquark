@@ -57,13 +57,7 @@ public class MemberResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("hello")
-    @SecurityRequirementsSet(
-        value = {
-            @SecurityRequirement(
-                name = "apikey"
-            )
-        }
-    )
+    @SecurityRequirement(name = "apikey")
     public String hello() {
         return "Hello RESTEasy";
     }
@@ -75,6 +69,7 @@ public class MemberResource {
 
    @GET
    @Produces(MediaType.APPLICATION_JSON)
+   @SecurityRequirement(name = "apikey")
    public List<Member> listAllMembers() {
        return memberRegistration.findAllOrderedByName();
    }
@@ -82,13 +77,7 @@ public class MemberResource {
    @GET
    @Path("/{id:[0-9][0-9]*}")
    @Produces(MediaType.APPLICATION_JSON)
-   @SecurityRequirementsSet(
-    value = {
-        @SecurityRequirement(
-            name = "apikey"
-        )
-    }
-    )
+   @SecurityRequirement(name = "apikey")
    public Member lookupMemberById(@PathParam("id") long id) {
        Member member = memberRegistration.findById(id);
        if (member == null) {
@@ -104,13 +93,7 @@ public class MemberResource {
    @POST
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
-   @SecurityRequirementsSet(
-    value = {
-        @SecurityRequirement(
-            name = "apikey"
-        )
-    }
-    )
+   @SecurityRequirement(name = "apikey")
    public Response createMember(@Valid Member member) {
     
         Response.ResponseBuilder builder = null;
@@ -152,13 +135,8 @@ public class MemberResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    @Path("/{email}")
-   @SecurityRequirementsSet(
-    value = {
-        @SecurityRequirement(
-            name = "apikey"
-        )
-    }
-    )
+   @SecurityRequirement(name = "apikey")
+
    public Response deleteMember(@PathParam("email") String emailAddress) {
 
        Response.ResponseBuilder builder = null;
