@@ -43,7 +43,6 @@ import org.jboss.logging.Logger;
 
 @Path("/membersweb/rest/members")
 @Tag(name = "Customer", description = "Customer Management")
-@Tag(name = "Service", description = "Customer")
 @SecuritySchemes(
     value = {
         @SecurityScheme(
