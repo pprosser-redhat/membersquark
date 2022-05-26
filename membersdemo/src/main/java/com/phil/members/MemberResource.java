@@ -14,6 +14,8 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import javax.validation.ConstraintViolation;
+
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.hibernate.exception.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -34,6 +36,8 @@ import com.phil.members.service.MemberRegistration;
 
 import org.jboss.logging.Logger;
 @Path("/membersweb/rest/members")
+@Tag(name = "Customer", description = "Customer Management")
+@Tag(name = "Service", description = "Customer")
 public class MemberResource {
 
     @GET
