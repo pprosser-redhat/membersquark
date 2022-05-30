@@ -3,6 +3,7 @@ package com.phil.members;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +16,8 @@ import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import javax.validation.ConstraintViolation;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeIn;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirementsSet;
@@ -40,15 +43,18 @@ import com.phil.members.model.Member;
 import com.phil.members.service.MemberRegistration;
 
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.annotations.Query;
 
 @Path("/membersweb/rest/members")
-@Tag(name = "Customer", description = "Customer Management")
+@Tag(name = "Customer Maintenance", description = "Customer Management")
 @SecuritySchemes(
     value = {
         @SecurityScheme(
             securitySchemeName = "apikey",
             type = SecuritySchemeType.APIKEY,
-            description = "Authentication required to use the customer API"
+            description = "Authentication required to use the customer API",
+            in = SecuritySchemeIn.HEADER,
+            apiKeyName = "user-key"
         )
     }
 )
@@ -56,7 +62,15 @@ public class MemberResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    @Path("hello")
+    @Path("/hello")
+    @Operation(
+        summary = "Say Hello!",
+        operationId = "hello"
+    )
+    @Tag(
+        name = "test",
+        description = "Test the API"
+        )
     @SecurityRequirement(name = "apikey")
     public String hello() {
         return "Hello RESTEasy";
@@ -66,9 +80,16 @@ public class MemberResource {
 
    @Inject
    MemberRegistration memberRegistration;
-
    @GET
    @Produces(MediaType.APPLICATION_JSON)
+   @Operation(
+       summary = "list all members",
+       operationId = "listAllMembers"
+   )
+   @Tag(
+       name = "list",
+       description = "Query Members"
+   )
    @SecurityRequirement(name = "apikey")
    public Response listAllMembers() {
        //return memberRegistration.findAllOrderedByName();
@@ -78,6 +99,14 @@ public class MemberResource {
    @GET
    @Path("/{id:[0-9][0-9]*}")
    @Produces(MediaType.APPLICATION_JSON)
+   @Operation(
+       summary = "List Member by Member ID",
+       operationId = "lookupMemberById"
+   )
+   @Tag(
+    name = "list",
+    description = "Query Members"
+    )
    @SecurityRequirement(name = "apikey")
    public Member lookupMemberById(@PathParam("id") long id) {
        Member member = memberRegistration.findById(id);
@@ -95,6 +124,10 @@ public class MemberResource {
    @POST
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
+   @Operation(
+       summary = "Create new member",
+       operationId = "createMember"
+   )
    @SecurityRequirement(name = "apikey")
    public Response createMember(@Valid Member member) {
     
@@ -137,6 +170,10 @@ public class MemberResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    @Path("/{email}")
+   @Operation(
+       summary = "Delete a member",
+       operationId = "deleteMember"
+   )
    @SecurityRequirement(name = "apikey")
    public Response deleteMember(@PathParam("email") String emailAddress) {
 
