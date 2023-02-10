@@ -19,6 +19,7 @@ import javax.validation.ConstraintViolation;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeIn;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
+import org.eclipse.microprofile.openapi.annotations.security.OAuthFlows;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirementsSet;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
@@ -47,17 +48,14 @@ import org.jboss.resteasy.annotations.Query;
 
 @Path("/membersweb/rest/members")
 @Tag(name = "Customer Maintenance", description = "Customer Management")
-@SecuritySchemes(
-    value = {
-        @SecurityScheme(
-            securitySchemeName = "apikey",
-            type = SecuritySchemeType.APIKEY,
-            description = "Authentication required to use the customer API",
-            in = SecuritySchemeIn.HEADER,
-            apiKeyName = "user-key"
-        )
-    }
-)
+@SecurityScheme(
+    securitySchemeName = "jwt",
+    type = SecuritySchemeType.HTTP,
+    scheme = "bearer", 
+    bearerFormat = "jwt",
+    openIdConnectUrl = "http://auth-server-url/.well-known/openid-configuration"
+    )
+
 public class MemberResource {
 
     @GET
@@ -71,7 +69,7 @@ public class MemberResource {
         name = "test",
         description = "Test the API"
         )
-    @SecurityRequirement(name = "apikey")
+    @SecurityRequirement(name = "jwt", scopes = {})
     public String hello() {
         return "Hello RESTEasy";
     }
@@ -90,7 +88,7 @@ public class MemberResource {
        name = "list",
        description = "Query Members"
    )
-   @SecurityRequirement(name = "apikey")
+   @SecurityRequirement(name = "openid")
    public Response listAllMembers() {
        //return memberRegistration.findAllOrderedByName();
        return Response.ok(memberRegistration.findAllOrderedByName()).build();
@@ -107,7 +105,7 @@ public class MemberResource {
     name = "list",
     description = "Query Members"
     )
-   @SecurityRequirement(name = "apikey")
+   @SecurityRequirement(name = "openid")
    public Member lookupMemberById(@PathParam("id") long id) {
        Member member = memberRegistration.findById(id);
        if (member == null) {
@@ -128,7 +126,7 @@ public class MemberResource {
        summary = "Create new member",
        operationId = "createMember"
    )
-   @SecurityRequirement(name = "apikey")
+   @SecurityRequirement(name = "openid")
    public Response createMember(@Valid Member member) {
     
         Response.ResponseBuilder builder = null;
@@ -174,7 +172,7 @@ public class MemberResource {
        summary = "Delete a member",
        operationId = "deleteMember"
    )
-   @SecurityRequirement(name = "apikey")
+   @SecurityRequirement(name = "openid")
    public Response deleteMember(@PathParam("email") String emailAddress) {
 
        Response.ResponseBuilder builder = null;
