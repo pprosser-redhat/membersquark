@@ -46,7 +46,7 @@ import com.phil.members.service.MemberRegistration;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.Query;
 
-@Path("/membersweb/rest/members")
+@Path("/v2/membersweb/rest/members")
 @Tag(name = "Customer Maintenance", description = "Customer Management")
 @SecurityScheme(
     securitySchemeName = "jwt",
@@ -88,7 +88,7 @@ public class MemberResource {
        name = "list",
        description = "Query Members"
    )
-   @SecurityRequirement(name = "openid")
+   @SecurityRequirement(name = "jwt", scopes = {})
    public Response listAllMembers() {
        //return memberRegistration.findAllOrderedByName();
        return Response.ok(memberRegistration.findAllOrderedByName()).build();
@@ -105,7 +105,7 @@ public class MemberResource {
     name = "list",
     description = "Query Members"
     )
-   @SecurityRequirement(name = "openid")
+    @SecurityRequirement(name = "jwt", scopes = {})
    public Member lookupMemberById(@PathParam("id") long id) {
        Member member = memberRegistration.findById(id);
        if (member == null) {
@@ -126,7 +126,7 @@ public class MemberResource {
        summary = "Create new member",
        operationId = "createMember"
    )
-   @SecurityRequirement(name = "openid")
+   @SecurityRequirement(name = "jwt", scopes = {})
    public Response createMember(@Valid Member member) {
     
         Response.ResponseBuilder builder = null;
