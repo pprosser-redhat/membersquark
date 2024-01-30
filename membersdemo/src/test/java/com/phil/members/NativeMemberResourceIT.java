@@ -1,8 +1,8 @@
 package com.phil.members;
 
-import io.quarkus.test.junit.NativeImageTest;
+import io.quarkus.test.junit.QuarkusIntegrationTest;
 
-@NativeImageTest
+@QuarkusIntegrationTest
 public class NativeMemberResourceIT extends MemberResourceTest {
 
     // Execute the same tests but in native mode.
