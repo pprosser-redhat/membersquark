@@ -1,3 +1,6 @@
 membersdemo/.dockerignore
 membersdemo/.mvn/wrapper/maven-wrapper.jar
 .vscode/settings.json
+.camel-jbang/camel-jbang-run.properties
+.camel-jbang/compile/UsedToWarmupDependenciesDownload.class
+.quarkus/cli/plugins/quarkus-cli-catalog.json

@@ -1,5 +1,11 @@
 # membersdemo project
 
+Easiest way to build and deploy now :- 
+
+```
+quarkus build -Dquarkus.kubernetes.deploy=true
+```
+
 Version 1 of the membersapp
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
