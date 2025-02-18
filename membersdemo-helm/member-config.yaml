@@ -4,7 +4,4 @@ metadata:
   name: member-config
   namespace: membersapp
 data:
-  quarkus.datasource.jdbc.url: 'jdbc:postgresql://postgresql:5432/sampledb'
-  quarkus.hibernate-orm.database.generation: none
-  quarkus.datasource.username: 
-  quarkus.datasource.password: 
+  quarkus_hibernate_orm_database_generation: drop-and-create

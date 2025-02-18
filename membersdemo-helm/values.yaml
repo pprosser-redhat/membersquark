@@ -125,14 +125,14 @@ affinity: {}
 env:
   - name: QUARKUS_DATASOURCE_JDBC_URL
     valueFrom:
-      configMapKeyRef:
-        name: member-config
-        key: quarkus.datasource.jdbc.url
-  - name: QUARKUS_HIBERNATE-ORM_DATABASE_GENERATION
-    valueFrom:
-      configMapKeyRef:
-        name: member-config
-        key: quarkus.hibernate-orm.database.generation
+      secretKeyRef:
+        name: members-db
+        key: DB_CONNECTION
+#  - name: QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION
+#    valueFrom:
+#      configMapKeyRef:
+#        name: member-config
+#        key: quarkus_hibernate_orm_database_generation
   - name: QUARKUS_DATABASE_USERNAME
     valueFrom:
       secretKeyRef:
