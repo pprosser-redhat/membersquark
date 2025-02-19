@@ -1,11 +1,5 @@
 namespace: kuadrant-system
 
-catalogSource:
-  sourceType: grpc
-  displayName: "RHCL Operators"
-  publisher: grpc
-  pollInterval: 45m
-
 subscription:
   channel: stable
   installPlanApproval: Automatic
