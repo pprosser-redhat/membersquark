@@ -11,3 +11,5 @@ subscription:
   installPlanApproval: Automatic
   name: rhcl-operator
   startingCSV: rhcl-operator.v1.0.0
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
