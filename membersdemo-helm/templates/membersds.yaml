@@ -1,9 +1,0 @@
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: member-config
-data:
-  quarkus.datasource.jdbc.url: 'jdbc:postgresql://postgresql:5432/sampledb'
-  quarkus.hibernate-orm.database.generation: none
-  quarkus.datasource.username: phil
-  quarkus.datasource.password: phil

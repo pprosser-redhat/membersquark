@@ -128,18 +128,18 @@ env:
       secretKeyRef:
         name: members-db
         key: DB_CONNECTION
-#  - name: QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION
-#    valueFrom:
-#      configMapKeyRef:
-#        name: member-config
-#        key: quarkus_hibernate_orm_database_generation
-  - name: QUARKUS_DATABASE_USERNAME
+  - name: QUARKUS_DATASOURCE_USERNAME
     valueFrom:
       secretKeyRef:
         name: members-db
         key: POSTGRESQL_USER
-  - name: QUARKUS_DATABASE_PASSWORD
+  - name: QUARKUS_DATASOURCE_PASSWORD
     valueFrom:
       secretKeyRef:
         name: members-db
         key: POSTGRESQL_PASSWORD
+  - name: QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION
+    valueFrom:
+      configMapKeyRef:
+        name: member-config
+        key: DB_GENERATION
