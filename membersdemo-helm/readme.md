@@ -1,0 +1,1 @@
+helm install membersappv2 ./membersdemo-helm --namespace members --take-ownership
