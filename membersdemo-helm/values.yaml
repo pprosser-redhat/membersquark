@@ -54,7 +54,7 @@ service:
   # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-  port: 8080
+  port: 80
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
@@ -87,13 +87,17 @@ resources: {}
 
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 livenessProbe:
+  failureThreshold: 3
   httpGet:
-    path: /
-    port: http
+    path: /q/health/live
+    port: 8080
+    scheme: HTTP
 readinessProbe:
+  failureThreshold: 3
   httpGet:
-    path: /
-    port: http
+    path: /q/health/ready
+    port: 8080
+    scheme: HTTP
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
@@ -125,21 +129,21 @@ affinity: {}
 env:
   - name: QUARKUS_DATASOURCE_JDBC_URL
     valueFrom:
-      configMapKeyRef:
-        name: member-config
-        key: quarkus.datasource.jdbc.url
-  - name: QUARKUS_HIBERNATE-ORM_DATABASE_GENERATION
-    valueFrom:
-      configMapKeyRef:
-        name: member-config
-        key: quarkus.hibernate-orm.database.generation
-  - name: QUARKUS_DATABASE_USERNAME
+      secretKeyRef:
+        name: members-db
+        key: DB_CONNECTION
+  - name: QUARKUS_DATASOURCE_USERNAME
     valueFrom:
       secretKeyRef:
         name: members-db
         key: POSTGRESQL_USER
-  - name: QUARKUS_DATABASE_PASSWORD
+  - name: QUARKUS_DATASOURCE_PASSWORD
     valueFrom:
       secretKeyRef:
         name: members-db
         key: POSTGRESQL_PASSWORD
+  - name: QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION
+    valueFrom:
+      configMapKeyRef:
+        name: member-config
+        key: DB_GENERATION
