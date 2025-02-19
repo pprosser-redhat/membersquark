@@ -1,0 +1,19 @@
+[all:vars]
+
+ocp4_workload_connectivity_link_aws_access_key=
+ocp4_workload_connectivity_link_aws_secret_access_key=
+
+# E.g.: sandbox902.opentlc.com
+ocp4_workload_connectivity_link_main_domain=sandbox1126.opentlc.com
+
+#don't change unless mandatory
+ocp4_workload_connectivity_link_sub_domain_name=crm
+
+# E.g.: This is the region where you have OpenShift running. (example eu-central-1)
+ocp4_workload_connectivity_link_aws_managed_zone_region=eu-west-1
+
+#your email address
+ocp4_workload_connectivity_link_ingress_gateway_tls_issuer_email=pprosser@redhat.com
+
+#E.g. EU/US
+ocp4_workload_connectivity_link_gateway_geo_code=EU

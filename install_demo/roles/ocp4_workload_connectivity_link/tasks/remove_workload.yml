@@ -1,0 +1,106 @@
+---
+
+- name: Running Pre Workload Tasks
+  ansible.builtin.include_tasks:
+    file: ./pre_workload.yml
+    apply:
+      become: "{{ become_override | bool }}"
+
+- name: Undeploy Apicurio Studio application
+  kubernetes.core.k8s:
+    state: absent
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: "{{ ocp4_workload_connectivity_link_apicurio_studio_application_name }}"
+    namespace: "{{ ocp4_workload_connectivity_link_argocd_namespace }}"
+    wait: true
+
+- name: Undeploy RHSSO application
+  kubernetes.core.k8s:
+    state: absent
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: "{{ ocp4_workload_connectivity_link_rhsso_application_name }}"
+    namespace: "{{ ocp4_workload_connectivity_link_argocd_namespace }}"
+    wait: true
+
+- name: Undeploy Observability Worker applications
+  kubernetes.core.k8s:
+    state: absent
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: "{{ ocp4_workload_connectivity_link_observability_worker_application_name }}"
+    namespace: "{{ ocp4_workload_connectivity_link_argocd_namespace }}"
+    wait: true
+
+- name: Undeploy Observability Hub applications
+  kubernetes.core.k8s:
+    state: absent
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: "{{ ocp4_workload_connectivity_link_observability_hub_application_name }}"
+    namespace: "{{ ocp4_workload_connectivity_link_argocd_namespace }}"
+    wait: true
+
+- name: Undeploy Ingress gateway application
+  kubernetes.core.k8s:
+    state: absent
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: "{{ ocp4_workload_connectivity_link_ingress_gateway_application_name }}"
+    namespace: "{{ ocp4_workload_connectivity_link_argocd_namespace }}"
+    wait: true
+
+- name: Undeploy Istio application
+  kubernetes.core.k8s:
+    state: absent
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: "{{ ocp4_workload_connectivity_link_istio_application_name }}"
+    namespace: "{{ ocp4_workload_connectivity_link_argocd_namespace }}"
+    wait: true
+
+- name: Undeploy Kuadrant application
+  kubernetes.core.k8s:
+    state: absent
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: "{{ ocp4_workload_connectivity_link_kuadrant_application_name }}"
+    namespace: "{{ ocp4_workload_connectivity_link_argocd_namespace }}"
+    wait: true
+
+- name: Undeploy Apicurio Studio Operator application
+  kubernetes.core.k8s:
+    state: absent
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: "{{ ocp4_workload_connectivity_link_apicurio_studio_operator_application_name }}"
+    namespace: "{{ ocp4_workload_connectivity_link_argocd_namespace }}"
+    wait: true
+
+- name: Undeploy RHSSO Operator application
+  kubernetes.core.k8s:
+    state: absent
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: "{{ ocp4_workload_connectivity_link_rhsso_operator_application_name }}"
+    namespace: "{{ ocp4_workload_connectivity_link_argocd_namespace }}"
+    wait: true
+
+- name: Undeploy Sail Operator application
+  kubernetes.core.k8s:
+    state: absent
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: "{{ ocp4_workload_connectivity_link_servicemesh_operator_application_name }}"
+    namespace: "{{ ocp4_workload_connectivity_link_argocd_namespace }}"
+    wait: true
+
+- name: Undeploy Kuadrant Operator application
+  kubernetes.core.k8s:
+    state: absent
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: "{{ ocp4_workload_connectivity_link_kuadrant_operator_application_name }}"
+    namespace: "{{ ocp4_workload_connectivity_link_argocd_namespace }}"
+    wait: true

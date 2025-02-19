@@ -1,0 +1,37 @@
+---
+- name: AWS Route53 setup
+  ansible.builtin.include_tasks: aws-setup.yml
+
+- name: User workload monitoring
+  ansible.builtin.include_tasks: user_workload_monitoring.yml
+
+- name: Install OpenShift Gitops
+  ansible.builtin.include_tasks: openshift_gitops.yml
+
+- name: Setup OpenShift Gitops
+  ansible.builtin.include_tasks: openshift_gitops_setup.yml
+
+- name: Install Cert Manager
+  ansible.builtin.include_tasks: cert-manager.yml
+
+- name: Install Kuadrant
+  ansible.builtin.include_tasks: kuadrant.yml
+
+- name: Install Service mesh  and Istio
+  ansible.builtin.include_tasks: servicemesh.yml
+
+- name: Install Ingress gateway
+  ansible.builtin.include_tasks: ingress_gateway.yml
+
+- name: Install Observability
+  ansible.builtin.include_tasks: observability.yaml
+
+- name: Install Echo API Application
+  ansible.builtin.include_tasks: echo_api.yml
+
+# - name: Install RHSSO
+#   ansible.builtin.include_tasks: rhsso.yml
+
+# - name: Install Apicurio Studio
+#   ansible.builtin.include_tasks: apicurio_studio.yml
+

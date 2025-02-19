@@ -1,0 +1,11 @@
+---
+
+- name: Install RHSSO operator
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'rhsso_operator_application.yaml.j2') | from_yaml }}"
+
+- name: Install RHSSO
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'rhsso_application.yaml.j2') | from_yaml }}"

@@ -1,0 +1,12 @@
+nameOverride: "keycloak"
+
+replicaCount: 1
+
+externalAccess: true
+
+apicurio:
+  realm: apicurio
+  service: apicurio-studio-ui
+  namespace: apicurio
+
+openshiftDomain: 
