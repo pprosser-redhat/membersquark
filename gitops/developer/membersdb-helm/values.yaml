@@ -110,6 +110,9 @@ tolerations: []
 
 affinity: {}
 
+db_user:
+db_password:
+
 env:
   - name: POSTGRESQL_USER
     valueFrom:
